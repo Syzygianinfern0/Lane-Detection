@@ -7,10 +7,10 @@ PIC = 'assets/dashcampic.png'
 
 
 def roi(image):
-    top_right = [830, 400]
-    top_left = [630, 400]
-    bottom_left = [350, 600]
-    bottom_right = [1050, 600]
+    top_right = [810, 430]
+    top_left = [670, 430]
+    bottom_left = [380, 600]
+    bottom_right = [1020, 600]
     vertices = [np.array([bottom_left, bottom_right, top_right, top_left], dtype=np.int32)]
 
     mask = np.zeros_like(image)
