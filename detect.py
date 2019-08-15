@@ -22,20 +22,17 @@ cv2.createTrackbar('ROI_V3_x', 'bars', 910, SHAPE[1], nothing)  # Bottom Right
 cv2.createTrackbar('ROI_V3_y', 'bars', 540, SHAPE[0], nothing)
 cv2.createTrackbar('ROI_V4_x', 'bars', 65, SHAPE[1], nothing)  # Bottom Left
 cv2.createTrackbar('ROI_V4_y', 'bars', 540, SHAPE[0], nothing)
+cv2.createTrackbar('Rho', 'bars', 1, 15, nothing)
+cv2.createTrackbar('Theta', 'bars', 1, 15, nothing)
+cv2.createTrackbar('Threshold', 'bars', 10, 30, nothing)
+cv2.createTrackbar('Min_Line_Length', 'bars', 20, 100, nothing)
+cv2.createTrackbar('Max_Line_Gap', 'bars', 1, 50, nothing)
 
 
 # noinspection PyShadowingNames
 def roi(image, vertices):
-    # top_right = [810, 430]
-    # top_left = [670, 430]
-    # bottom_left = [380, 600]
-    # bottom_right = [1020, 600]
-    # # noinspection PyShadowingNames
-    # vertices = [np.array([bottom_left, bottom_right, top_right, top_left], dtype=np.int32)]
-
     mask = np.zeros_like(image)
     cv2.fillPoly(mask, [np.int32(vertices)], 255)
-    # cv2.fillPoly(mask, [np.int32(np.flip(vertices, axis=0))], 255)
 
     masked_image = cv2.bitwise_and(image, mask)
     return masked_image
@@ -60,15 +57,34 @@ if __name__ == '__main__':
                      cv2.getTrackbarPos('ROI_V3_y', 'bars')),
                     (cv2.getTrackbarPos('ROI_V4_x', 'bars'),
                      cv2.getTrackbarPos('ROI_V4_y', 'bars')))
+        rho = cv2.getTrackbarPos('Rho', 'bars')
+        theta = cv2.getTrackbarPos('Theta', 'bars') * np.pi / 180
+        threshold = cv2.getTrackbarPos('Threshold', 'bars')
+        min_line_len = cv2.getTrackbarPos('Min_Line_Length', 'bars')
+        max_line_gap = cv2.getTrackbarPos('Max_Line_Gap', 'bars')
 
         blur_image = cv2.GaussianBlur(test_img, (kernel, kernel), 0)
         canny_image = cv2.Canny(blur_image, low, high)
         roi_img = roi(blur_image, vertices)
         roi_canny = roi(canny_image, vertices)
+        lines = cv2.HoughLinesP(roi_canny,
+                                rho, theta, threshold,
+                                np.array([]),
+                                min_line_len, max_line_gap)
+        line_img = np.zeros((test_img.shape[0], test_img.shape[1], 3), dtype=np.uint8)
+        try:
+            for line in lines:
+                for x1, y1, x2, y2 in line:
+                    cv2.line(line_img, (x1, y1), (x2, y2), (255, 0, 0), 10)
+        except:
+            pass
+
 
         cv2.imshow('test', test_img)
         cv2.imshow('blur_image', blur_image)
         cv2.imshow('canny_image', canny_image)
         cv2.imshow('roi_img', roi_img)
         cv2.imshow('roi_canny', roi_canny)
+        cv2.imshow('line_img', line_img)
     cv2.destroyAllWindows()
+
