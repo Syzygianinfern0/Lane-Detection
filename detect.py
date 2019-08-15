@@ -2,8 +2,26 @@ import cv2
 import numpy as np
 import matplotlib.pyplot as plt
 
-VIDEO = 'assets/dashcamvid.mp4'
-PIC = 'assets/dashcampic.png'
+PIC = 'assets/solidWhiteCurve.jpg'
+SHAPE = cv2.imread(PIC).shape
+
+
+def nothing(x):
+    pass
+
+
+cv2.namedWindow('bars')
+cv2.createTrackbar('Blur', 'bars', 1, 15, nothing)
+cv2.createTrackbar('Canny_Low', 'bars', 50, 255, nothing)
+cv2.createTrackbar('Canny_High', 'bars', 150, 255, nothing)
+cv2.createTrackbar('ROI_V1_x', 'bars', 0, SHAPE[0], nothing)  # Top Left
+cv2.createTrackbar('ROI_V1_y', 'bars', 0, SHAPE[1], nothing)
+cv2.createTrackbar('ROI_V2_x', 'bars', SHAPE[0], SHAPE[0], nothing)  # Top Right
+cv2.createTrackbar('ROI_V2_y', 'bars', 0, SHAPE[1], nothing)
+cv2.createTrackbar('ROI_V3_x', 'bars', SHAPE[0], SHAPE[0], nothing)  # Bottom Right
+cv2.createTrackbar('ROI_V3_y', 'bars', SHAPE[1], SHAPE[1], nothing)
+cv2.createTrackbar('ROI_V4_x', 'bars', 0, SHAPE[0], nothing)  # Bottom Left
+cv2.createTrackbar('ROI_V4_y', 'bars', SHAPE[1], SHAPE[1], nothing)
 
 
 def roi(image):
@@ -22,8 +40,8 @@ def roi(image):
 
 if __name__ == '__main__':
     test_img = cv2.imread(PIC, cv2.IMREAD_GRAYSCALE)
-    blur_image = cv2.GaussianBlur(test_img, (3, 3), 0)
-    canny_image = cv2.Canny(blur_image, 100, 150)
+    blur_image = cv2.GaussianBlur(test_img, (5, 5), 0)
+    canny_image = cv2.Canny(blur_image, 50, 150)
 
     roi_img = roi(canny_image)
 
