@@ -2,7 +2,7 @@ import cv2
 import numpy as np
 import matplotlib.pyplot as plt
 
-PIC = 'assets/solidYellowLeft.jpg'
+PIC = 'assets/whiteCarLaneSwitch.jpg'
 SHAPE = cv2.imread(PIC).shape
 
 
@@ -38,7 +38,7 @@ def roi(image, vertices):
     return masked_image
 
 
-def drawLine(img, x, y, color=[255, 0, 0], thickness=20):
+def draw_line(img, x, y, color=[0, 0, 255], thickness=20):
     if len(x) == 0:
         return
     lineParameters = np.polyfit(x, y, 1)
@@ -74,9 +74,9 @@ def draw_lines(img, lines, color=[0, 0, 255], thickness=20):
                 rightPointsX.append(x2)
                 rightPointsY.append(y2)
 
-    drawLine(img, leftPointsX, leftPointsY, color, thickness)
+    draw_line(img, leftPointsX, leftPointsY, color, thickness)
 
-    drawLine(img, rightPointsX, rightPointsY, color, thickness)
+    draw_line(img, rightPointsX, rightPointsY, color, thickness)
 
 
 if __name__ == '__main__':
@@ -125,5 +125,5 @@ if __name__ == '__main__':
         cv2.imshow('roi_canny', roi_canny)
         cv2.imshow('line_img', line_img)
         cv2.imshow('result', result)
+    cv2.imwrite('results/' + PIC.split('/')[-1], result)
     cv2.destroyAllWindows()
-
