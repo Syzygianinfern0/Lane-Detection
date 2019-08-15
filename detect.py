@@ -38,7 +38,49 @@ def roi(image, vertices):
     return masked_image
 
 
+def drawLine(img, x, y, color=[255, 0, 0], thickness=20):
+    if len(x) == 0:
+        return
+    lineParameters = np.polyfit(x, y, 1)
+    m = lineParameters[0]
+    b = lineParameters[1]
+    maxY = img.shape[0]
+    maxX = img.shape[1]
+    y1 = maxY
+    x1 = int((y1 - b) / m)
+    y2 = int((maxY / 2)) + 60
+    x2 = int((y2 - b) / m)
+    cv2.line(img, (x1, y1), (x2, y2), color, thickness)
+
+
+# noinspection PyShadowingNames
+def draw_lines(img, lines, color=[0, 0, 255], thickness=20):
+    leftPointsX = []
+    leftPointsY = []
+    rightPointsX = []
+    rightPointsY = []
+
+    for line in lines:
+        for x1, y1, x2, y2 in line:
+            m = (y1 - y2) / (x1 - x2)
+            if m < 0:
+                leftPointsX.append(x1)
+                leftPointsY.append(y1)
+                leftPointsX.append(x2)
+                leftPointsY.append(y2)
+            else:
+                rightPointsX.append(x1)
+                rightPointsY.append(y1)
+                rightPointsX.append(x2)
+                rightPointsY.append(y2)
+
+    drawLine(img, leftPointsX, leftPointsY, color, thickness)
+
+    drawLine(img, rightPointsX, rightPointsY, color, thickness)
+
+
 if __name__ == '__main__':
+    original = cv2.imread(PIC)
     test_img = cv2.imread(PIC, cv2.IMREAD_GRAYSCALE)
 
     while True:
@@ -72,13 +114,9 @@ if __name__ == '__main__':
                                 np.array([]),
                                 min_line_len, max_line_gap)
         line_img = np.zeros((test_img.shape[0], test_img.shape[1], 3), dtype=np.uint8)
-        try:
-            for line in lines:
-                for x1, y1, x2, y2 in line:
-                    cv2.line(line_img, (x1, y1), (x2, y2), (255, 0, 0), 10)
-        except:
-            pass
+        draw_lines(line_img, lines)
 
+        result = cv2.addWeighted(original, 0.8, line_img, 1.0, 0)
 
         cv2.imshow('test', test_img)
         cv2.imshow('blur_image', blur_image)
@@ -86,5 +124,6 @@ if __name__ == '__main__':
         cv2.imshow('roi_img', roi_img)
         cv2.imshow('roi_canny', roi_canny)
         cv2.imshow('line_img', line_img)
+        cv2.imshow('result', result)
     cv2.destroyAllWindows()
 
